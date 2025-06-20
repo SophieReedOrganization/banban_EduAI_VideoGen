@@ -5,6 +5,90 @@ from edge_tts import Communicate
 from datetime import datetime, timezone
 import tempfile, io, os, base64, asyncio, PIL.Image, shutil, glob
 
+# 簡化版的階段性視頻生成，可以在任何階段停止並返回結果
+async def process_video_until_stage(
+    region: str,
+    client_id: str,
+    task_id: str,
+    text: str,
+    voice: str,
+    image_base64: str,
+    content: str,
+    stop_at_stage: int = 7  # 1=動畫說明, 2=動畫腳本, 3=腳本檢查, 4=語音腳本, 5=視頻生成, 6=語音生成, 7=完整流程
+):
+    """
+    在指定階段停止的視頻生成函數
+    stop_at_stage: 1-7 對應不同的停止階段
+    """
+    text = text.replace("$", "$$")
+    results = {}
+    
+    try:
+        Logger.info(f"開始處理視頻生成直到階段 {stop_at_stage}, client_id: {client_id}, task_id: {task_id}")
+        
+        # 階段1: 生成動畫說明
+        Logger.info(f"[階段1] 開始生成動畫說明...{datetime.now()}")
+        animation_story = await generate_animation_story(text, voice, image_base64)
+        results["animation_story"] = animation_story
+        Logger.info(f"✓ 動畫說明生成完成，長度: {len(animation_story)} 字符")
+        
+        if stop_at_stage == 1:
+            return {"stage": 1, "stage_name": "動畫說明", "result": animation_story, "all_results": results}
+        
+        # 階段2: 生成動畫腳本
+        Logger.info(f"[階段2] 開始生成動畫腳本...{datetime.now()}")
+        animation_script = await generate_manim_script(animation_story, voice, image_base64)
+        results["animation_script"] = animation_script
+        Logger.info(f"✓ 動畫腳本生成完成，長度: {len(animation_script)} 字符")
+        
+        if stop_at_stage == 2:
+            return {"stage": 2, "stage_name": "動畫腳本", "result": animation_script, "all_results": results}
+        
+        # 階段3: 檢查動畫腳本
+        Logger.info(f"[階段3] 開始檢查動畫腳本...{datetime.now()}")
+        confirm_animation_script = await check_animation_script(animation_script)
+        results["checked_script"] = confirm_animation_script
+        Logger.info(f"✓ 動畫腳本檢查完成")
+        
+        if stop_at_stage == 3:
+            return {"stage": 3, "stage_name": "腳本檢查", "result": confirm_animation_script, "all_results": results}
+        
+        # 階段4: 生成語音腳本
+        Logger.info(f"[階段4] 開始生成語音腳本...{datetime.now()}")
+        speech_script = await generate_speech_script(confirm_animation_script, voice)
+        results["speech_script"] = speech_script
+        Logger.info(f"✓ 語音腳本生成完成，長度: {len(speech_script)} 字符")
+        
+        if stop_at_stage == 4:
+            return {"stage": 4, "stage_name": "語音腳本", "result": speech_script, "all_results": results}
+        
+        # 階段5: 生成視頻
+        Logger.info(f"[階段5] 開始生成視頻...{datetime.now()}")
+        video_path, video_duration, temp_video_dir = await generate_video(confirm_animation_script)
+        results["video_info"] = {"path": video_path, "duration": video_duration, "temp_dir": temp_video_dir}
+        Logger.info(f"✓ 視頻生成完成，時長: {video_duration:.2f}秒")
+        
+        if stop_at_stage == 5:
+            return {"stage": 5, "stage_name": "視頻生成", "result": f"視頻已生成，時長: {video_duration:.2f}秒", "all_results": results}
+        
+        # 階段6: 生成語音
+        Logger.info(f"[階段6] 開始生成語音...{datetime.now()}")
+        audio_path, audio_duration = await generate_speech(speech_script, voice, task_id)
+        results["audio_info"] = {"path": audio_path, "duration": audio_duration}
+        Logger.info(f"✓ 語音生成完成，時長: {audio_duration:.2f}秒")
+        
+        if stop_at_stage == 6:
+            return {"stage": 6, "stage_name": "語音生成", "result": f"語音已生成，時長: {audio_duration:.2f}秒", "all_results": results}
+        
+        # 階段7: 完整流程（原本的邏輯）
+        Logger.info(f"[階段7] 繼續完整的視頻處理流程...")
+        # 這裡可以繼續原本的合併、上傳等邏輯
+        return {"stage": 7, "stage_name": "完整流程", "result": "繼續完整流程", "all_results": results}
+        
+    except Exception as e:
+        Logger.error(f"階段 {stop_at_stage} 處理失敗: {str(e)}")
+        return {"stage": stop_at_stage, "stage_name": f"階段{stop_at_stage}", "error": str(e), "all_results": results}
+
 async def process_generate_educational_video(
     region: str,
     client_id: str,

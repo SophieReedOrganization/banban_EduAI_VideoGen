@@ -180,3 +180,6 @@ video_sample/
 
 # google credentials
 app/core/credentials/google.json
+
+test.py
+test.ipynb

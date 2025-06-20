@@ -3,7 +3,7 @@ from datetime import datetime, timezone
 from app.core import MongoDB, Config
 from app.middleware import CustomJSONResponse
 from .schema import VideoGenerationRequest
-from .service import process_generate_educational_video,identify_keyword
+from .service import process_generate_educational_video,identify_keyword, process_video_until_stage
 
 router = APIRouter(prefix="/video", tags=["video"])
 
@@ -109,3 +109,37 @@ async def delete_all_video_tasks(
     region = "openql"
     await MongoDB.delete_many(f"{region.title()}Video", {"client_id": client_id})
     return CustomJSONResponse(content={"message": "All tasks deleted successfully"})
+
+# 新增：階段性視頻生成 API（簡化版）
+@router.post("/generate-debug/{client_id}")
+async def generate_video_debug(
+    client_id: str,
+    request_data: VideoGenerationRequest,
+    stop_stage: int = 1  # 查詢參數，指定在哪個階段停止
+):
+    """
+    階段性視頻生成，可以在指定階段停止並返回結果
+    stop_stage: 1=動畫說明, 2=動畫腳本, 3=腳本檢查, 4=語音腳本, 5=視頻生成, 6=語音生成, 7=完整流程
+    """
+    region = "openql"
+    task_id = f"debug_{client_id}_{int(datetime.now().timestamp())}"
+    
+    try:
+        result = await process_video_until_stage(
+            region=region,
+            client_id=client_id,
+            task_id=task_id,
+            text=request_data.text,
+            voice=request_data.voice,
+            image_base64=request_data.image_base64,
+            content=request_data.content,
+            stop_at_stage=stop_stage
+        )
+        
+        return CustomJSONResponse(content={"data": result})
+        
+    except Exception as e:
+        return CustomJSONResponse(
+            content={"error": str(e)}, 
+            status_code=500
+        )

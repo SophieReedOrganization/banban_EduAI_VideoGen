@@ -1,14 +1,14 @@
 steps:
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['build', '-t', 'gcr.io/$PROJECT_ID/k12-edu-ai-media-generator:$COMMIT_SHA', '.']
+    args: ['build', '-t', 'gcr.io/$PROJECT_ID/banban-eduai-videogen:$COMMIT_SHA', '.']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/k12-edu-ai-media-generator:$COMMIT_SHA']
+    args: ['push', 'gcr.io/$PROJECT_ID/banban-eduai-videogen:$COMMIT_SHA']
   - name: 'gcr.io/cloud-builders/gcloud'
     args:
       - 'run'
       - 'deploy'
-      - 'k12-edu-ai-media-generator-gpu'
-      - '--image=gcr.io/$PROJECT_ID/k12-edu-ai-media-generator:$COMMIT_SHA'
+      - 'banban-eduai-videogen'
+      - '--image=gcr.io/$PROJECT_ID/banban-eduai-videogen:$COMMIT_SHA'
       - '--region=asia-southeast1'
       - '--platform=managed'
       - '--allow-unauthenticated'
@@ -24,11 +24,11 @@ steps:
       #- '--gpu=1'
       #- '--gpu-type=nvidia-l4'
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['tag', 'gcr.io/$PROJECT_ID/k12-edu-ai-media-generator:$COMMIT_SHA', 'gcr.io/$PROJECT_ID/k12-edu-ai-media-generator:latest']
+    args: ['tag', 'gcr.io/$PROJECT_ID/banban-eduai-videogen:$COMMIT_SHA', 'gcr.io/$PROJECT_ID/banban-eduai-videogen:latest']
   - name: 'gcr.io/cloud-builders/docker'
-    args: ['push', 'gcr.io/$PROJECT_ID/k12-edu-ai-media-generator:latest']
+    args: ['push', 'gcr.io/$PROJECT_ID/banban-eduai-videogen:latest']
 images:
-  - 'gcr.io/$PROJECT_ID/k12-edu-ai-media-generator:$COMMIT_SHA'
-  - 'gcr.io/$PROJECT_ID/k12-edu-ai-media-generator:latest'
+  - 'gcr.io/$PROJECT_ID/banban-eduai-videogen:$COMMIT_SHA'
+  - 'gcr.io/$PROJECT_ID/banban-eduai-videogen:latest'
 options:
   logging: CLOUD_LOGGING_ONLY

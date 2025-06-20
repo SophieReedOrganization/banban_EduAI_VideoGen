@@ -63,3 +63,14 @@ def create_app() -> FastAPI:
     apply_routes(app)
 
     return app
+
+# 開發模式快速啟動
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "app.main:create_app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True,
+        factory=True
+    )

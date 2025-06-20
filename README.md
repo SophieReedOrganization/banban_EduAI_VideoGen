@@ -1,6 +1,6 @@
-# K12 教育 AI 媒體生成器 (K12 Education AI Media Generator)
+# BanBan 教育 AI 視頻生成器 (BanBan Education AI Video Generator)
 
-這是一個基於 AI 的教育媒體生成系統，專為 K12 教育領域設計。本系統能夠根據教育內容自動生成高品質的教學視頻，幫助教師豐富教學素材。
+這是一個基於 AI 的教育媒體生成系統，專為 BanBan 教育平台設計。本系統能夠根據教育內容自動生成高品質的教學視頻，幫助教師豐富教學素材。
 
 ## 主要功能
 
@@ -35,8 +35,8 @@
 1. 克隆儲存庫：
 
 ```bash
-git clone https://github.com/yourorganization/k12_edu_ai_media_generator.git
-cd k12_edu_ai_media_generator
+git clone https://github.com/yourorganization/banban_EduAI_VideoGen.git
+cd banban_EduAI_VideoGen
 ```
 
 2. 使用 Poetry 安裝依賴：
@@ -50,7 +50,7 @@ poetry install
 創建 `.env` 文件：
 
 ```
-APP_NAME=k12-edu-ai-media-generator
+APP_NAME=banban-eduai-videogen
 APP_ENV=dev
 APP_VERSION=0.1.0
 MONGODB_URI=your_mongodb_uri
@@ -69,14 +69,14 @@ app/core/credentials/google.json
 ### 啟動服務
 
 ```bash
-poetry run python -m uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000
+poetry run python -m uvicorn app.main:create_app --factory --host 0.0.0.0 --port 8000 --reload
 ```
 
 或使用 Docker：
 
 ```bash
-docker build -t k12-edu-ai-media-generator .
-docker run -p 8000:8000 k12-edu-ai-media-generator
+docker build -t banban-eduai-videogen .
+docker run -p 8000:8000 banban-eduai-videogen
 ```
 
 ### API 文檔

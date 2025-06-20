@@ -11,7 +11,7 @@ class _Config:
     
     LOG_LEVEL: str = os.environ.get("LOG_LEVEL", "INFO")
     LOG_FORMAT: str = os.environ.get("LOG_FORMAT", "%(asctime)s - %(name)s - %(levelname)s - %(message)s")
-    APP_NAME: str = os.environ.get("APP_NAME", "k12-edu-ai-media-generator-gpu")
+    APP_NAME: str = os.environ.get("APP_NAME", "banban-eduai-videogen-gpu")
     APP_ENV: str = os.environ.get("APP_ENV", "dev")
     APP_VERSION: str = os.environ.get("APP_VERSION", "0.0.7")
     PROJECT_NUMBER: str = os.environ.get("PROJECT_NUMBER", "980700405323")

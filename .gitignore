@@ -177,3 +177,6 @@ cython_debug/
 # media and sample
 media/
 video_sample/
+
+# google credentials
+app/core/credentials/google.json

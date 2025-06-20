@@ -1,0 +1,22 @@
+[tool.poetry]
+name = "banban-eduai-videogen"
+version = "0.1.0"
+description = "banban-eduai-videogen"
+authors = ["TissenChen <yetta_chen@oneclass.tw>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+google-genai = "^1.13.0"
+uvicorn = "^0.34.2"
+fastapi = "^0.115.12"
+python-dotenv = "^1.1.0"
+motor = "^3.7.0"
+google-cloud-storage = "^3.1.0"
+psutil = "^7.0.0"
+manim = "^0.19.0"
+edge-tts = "^7.0.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
